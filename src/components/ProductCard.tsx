@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../pages/CartContext";
 
 interface Product {
   id: number;
@@ -14,46 +16,85 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleViewDetails = () => {
+    navigate(`/product/${product.id}`);
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
+  };
+
+  const toggleFavorite = () => {
+    setIsFavorite((prev) => !prev);
+  };
+
   return (
-    <div className="w-[250px] h-[350px] bg-[#e0e0e0] rounded-[20px] shadow-[9px_9px_18px_#5a5a5a,-9px_-9px_18px_#ffffff] flex flex-col transition duration-400 hover:scale-[1.02] hover:shadow-[0px_0px_10px_2px_#5a5a5a] relative m-4">
-      {/* Card Image */}
-      <img
-        src={product.image}
-        alt={product.title}
-        className="w-full h-[150px] object-contain rounded-t-[20px]"
-      />
-
-      {/* Card Content */}
-      <div className="flex-1 p-4 grid gap-2 overflow-hidden">
-        {/* Title */}
-        <h2 className="text-center text-[#323232] font-bold text-base truncate">
-          {product.title}
-        </h2>
-
-        {/* Price */}
-        <p className="text-center text-[#323232] font-semibold text-sm">
-          ${product.price.toFixed(2)}
-        </p>
-
-        {/* Description */}
-        <p className="text-[#323232] text-xs line-clamp-3">
-          {product.description}
-        </p>
-
-        {/* Links */}
-        <div className="flex justify-between mt-auto">
-          <a
-            href="#"
-            className="text-[#323232] font-semibold text-sm hover:underline"
+    <div className="w-full max-w-xs m-4">
+      <div className="bg-white rounded-lg overflow-hidden shadow-lg ring-4 ring-red-500 ring-opacity-40 h-full flex flex-col transition-transform transform hover:scale-105 hover:shadow-xl duration-300">
+        {/* Product Image */}
+        <div className="relative h-48 w-full bg-white flex items-center justify-center">
+          <img
+            className="max-h-full max-w-full object-contain p-4"
+            src={product.image}
+            alt={product.title}
+          />
+          {/* SALE Badge */}
+          <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 m-2 rounded-md text-sm font-medium">
+            SALE
+          </div>
+          {/* Favorite Icon */}
+          <button
+            onClick={toggleFavorite}
+            className={`absolute top-3 left-3 text-xl ${
+              isFavorite ? "text-red-500" : "text-gray-500"
+            }`}
           >
-            View Details
-          </a>
-          <a
-            href="#"
-            className="text-[#323232] font-semibold text-sm hover:underline"
-          >
-            Add to Cart
-          </a>
+            {isFavorite ? "❤️" : "🤍"}
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 flex flex-col justify-between flex-grow">
+          <div>
+            <h3 className="text-lg font-medium mb-2 line-clamp-2">
+              {product.title}
+            </h3>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+              {product.description}
+            </p>
+          </div>
+
+          <div className="mt-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-bold text-lg">
+                ${product.price.toFixed(2)}
+              </span>
+              <button
+                onClick={handleAddToCart}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Add to Cart
+              </button>
+            </div>
+            <div className="text-center">
+              <button
+                onClick={handleViewDetails}
+                className="text-blue-500 hover:underline text-sm font-semibold"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
